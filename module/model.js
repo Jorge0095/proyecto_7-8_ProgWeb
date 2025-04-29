@@ -12,6 +12,7 @@ let conexion;
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD  || 'J0RG1nh@', 
       database: process.env.DB_DATABASE || 'proyectofinal',
+      port: process.env.DB_PORT || 3306,
     });
     console.log('Conectado a la base de datos proyectofinal');
   } catch (err) {
