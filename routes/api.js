@@ -1,4 +1,3 @@
-
 const express = require('express');
 const router = express.Router();
 const connectDB = require('../module/db');
@@ -183,4 +182,72 @@ router.post('/upload', upload.single('image'), async (req, res) => {
   }
 });
 
-module.exports = router;
+router.post('/alumnos', async (req, res) => {
+  const { matricula, nombre, carrera, status } = req.body;
+
+  try {
+    // Validación básica
+    if (!matricula || !nombre || !carrera) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Todos los campos son obligatorios' 
+      });
+    }
+
+    // Mapeo de carreras
+    const carrerasMap = {
+      '1': 'Ingeniería Mecatrónica',
+      '2': 'Ingeniería en Biotecnología',
+      '3': 'Ingeniería en Informática',
+      '4': 'Ingeniería en Energía',
+      '5': 'Ingeniería Logística y Transporte',
+      '6': 'Ingeniería en Tecnología Ambiental',
+      '7': 'Ingeniería Biomédica',
+      '8': 'Ingeniería en Animación y Efectos Visuales',
+      '9': 'Ingeniería en Nanotecnología',
+      '10': 'Ingeniería en Energía y Desarrollo Sostenible'
+    };
+
+    // Obtener último ID del JSON
+    const alumnosPath = path.join(__dirname, '../uploads/alumnos.json');
+    let alumnosArray = [];
+    
+    try {
+      const jsonContent = await fs.readFile(alumnosPath, 'utf8');
+      alumnosArray = JSON.parse(jsonContent);
+    } catch (err) {
+      alumnosArray = [];
+    }
+
+    const nextId = alumnosArray.length > 0 
+      ? Math.max(...alumnosArray.map(a => a.id)) + 1 
+      : 1;
+
+    // Crear nuevo alumno
+    const nuevoAlumno = {
+      id: nextId,
+      matricula,
+      nombre,
+      carrera: carrerasMap[carrera] || 'Carrera no especificada',
+      status: status ? true : false,
+      created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
+    };
+
+    // Agregar al array y guardar
+    alumnosArray.push(nuevoAlumno);
+    await fs.writeFile(alumnosPath, JSON.stringify(alumnosArray, null, 2));
+
+    res.status(201).json({ 
+      success: true,
+      message: 'Alumno registrado correctamente',
+      data: nuevoAlumno
+    });
+
+  } catch (error) {
+    console.error('Error al registrar alumno:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al registrar alumno' 
+    });
+  }
+});
