@@ -8,13 +8,13 @@ let conexion;
 (async () => {
   try {
     conexion = await mysql.createConnection({
-      host: process.env.DB_HOST || '127.0.0.1',
-      user: process.env.DB_USER || 'root',
-      password: process.env.DB_PASSWORD  || 'J0RG1nh@', 
-      database: process.env.DB_DATABASE || 'proyectofinal',
-      port: process.env.DB_PORT || 3306,
+      host: process.env.MYSQL_HOST || process.env.DB_PRIVATE_DOMAIN,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      port: process.env.DB_PORT,
     });
-    console.log('Conectado a la base de datos proyectofinal');
+    console.log(`Conectado a la base de datos: ${process.env.DB_DATABASE}`);
   } catch (err) {
     console.error('Error de conexión a la base de datos:', err);
   }

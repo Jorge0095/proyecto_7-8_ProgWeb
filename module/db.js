@@ -11,7 +11,7 @@ const mysql = require('mysql2/promise');
 // });
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST,
+  host: process.env.MYSQL_HOST || process.env.DB_PRIVATE_DOMAIN,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
