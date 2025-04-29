@@ -8,7 +8,7 @@ let conexion;
 (async () => {
   try {
     conexion = await mysql.createConnection({
-      host: process.env.MYSQL_HOST || process.env.DB_PRIVATE_DOMAIN,
+      host: process.env.MYSQL_HOST || process.env.DB_URL,
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
