@@ -10,6 +10,7 @@ async function connectDB() {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       port: process.env.DB_PORT || 3306,
+      multipleStatements: true,
     });
     console.log(`Conectado a la base de datos: ${process.env.MYSQLDATABASE}`);
   }
