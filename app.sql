@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS alumnos (
   matricula VARCHAR(20) NOT NULL,
   nombre VARCHAR(100) NOT NULL,
   carrera VARCHAR(100) NOT NULL,
-  status BOOLEAN,
+  status BOOLEAN 
 );
 
 CREATE INDEX idx_matricula ON alumnos(matricula);
