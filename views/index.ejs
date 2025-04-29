@@ -94,12 +94,20 @@
   
 <script>
 
-  document.getElementById('limpiarImagen').addEventListener('click', function() {
-    const cardContainer = document.querySelector('.card');
-    if (cardContainer) {
-      cardContainer.style.display = 'none';
-    }
-  });
+document.getElementById('limpiarImagen').addEventListener('click', function() {
+  const imageContainer = document.querySelector('.container.mb-5');
+  if (imageContainer) {
+    imageContainer.innerHTML = ''; // Clear the container completely
+  }
+  // Clear the search input
+  document.querySelector('input[name="id"]').value = '';
+  // Clear any messages
+  const mensajeDiv = document.getElementById('mensajeBusqueda');
+  if (mensajeDiv) {
+    mensajeDiv.textContent = '';
+    mensajeDiv.classList.add('d-none');
+  }
+});
 
   document.getElementById('limpiarTabla').addEventListener('click', function() {
     const tbody = document.querySelector('table tbody');
