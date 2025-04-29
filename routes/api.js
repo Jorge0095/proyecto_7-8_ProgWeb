@@ -1,7 +1,7 @@
-import db from '../module/db.js';
+
 const express = require('express');
 const router = express.Router();
-// const db = require('../module/db');
+const db = require('../module/db');
 const alumnoDB = require('../module/model'); 
 const multer = require('multer');
 const path = require('path');

@@ -11,7 +11,7 @@ const mysql = require('mysql2/promise');
 //   queueLimit: 0
 // });
 
-const mysql = await mysql.createConnection({
+const db = await mysql.createConnection({
   host: process.env.DB_HOST || process.env.DB_URL,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
