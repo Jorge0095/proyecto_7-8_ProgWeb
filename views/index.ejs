@@ -1,0 +1,289 @@
+<%- include('layout') %>
+
+<div class="text-center mb-5">
+  <h2>Bienvenido a la Galería del Proyecto Final</h2>
+  <p class="lead">Consulta alumnos por ID o cualquier dato, y visualiza su imagen y detalles registrados.</p>
+</div>
+
+<!-- Buscar Imagen por ID -->
+<div class="container mb-9">
+  <h4>Buscar imagen por ID</h4>
+  <form action="/api/buscar-id" method="GET" class="row g-5">
+    <div class="col-auto">
+      <input type="number" name="id" class="form-control" placeholder="Introduce ID de la imagen" required>
+    </div>
+    <div class="col-auto d-flex gap-2">
+      <button type="submit" class="btn btn-primary mb-3">Buscar</button>
+      <button id="limpiarImagen" class="btn btn-warning mb-3">Limpiar Imagen</button>
+    </div>
+  </form>
+
+  <div class="container mb-5">
+    <% if (imagenPorId) { %>
+      <div class="card">
+        <div class="card-header">
+          <h4>Imagen encontrada (ID: <%= imagenPorId.id %>)</h4>
+        </div>
+        <div class="card-body text-center">
+          <img src="/uploads/<%= imagenPorId.filename %>" 
+               class="img-fluid rounded" 
+               style="max-height: 400px;" 
+               alt="Imagen encontrada">
+          <p class="mt-2 text-muted">Nombre del archivo: <%= imagenPorId.filename %></p>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="text-center mt-3">
+  </div>
+</div>
+<br><br>
+
+<!-- Buscar por cualquier dato -->
+<form id="alumnirijillos" action="/api" method="GET" class="row g-3">
+  <div class="col-md-3">
+    <select name="campo" class="form-select" id="campoBusqueda" required>
+      <option value="nombre">Nombre</option>
+      <option value="matricula">Matrícula</option>
+      <option value="carrera">Carrera</option>
+    </select>
+  </div>
+  <div class="col-md-6" id="valorContainer">
+    <input type="text" name="valor" class="form-control" placeholder="Introduce el valor a buscar" required>
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-success w-100">Filtrar alumno</button>
+  </div>
+</form>
+
+<div id="mensajeBusqueda" class="alert mt-3 d-none"></div>
+
+  <div class="text-center mb-5">
+    <br><br>
+    <a href="/inicio" class="btn btn-secondary">Reiniciar Página</a>
+    <button id="limpiarTabla" class="btn btn-danger">Ocultar Tabla</button>
+  </div>
+
+  <% if (Array.isArray(alumnosFiltrados) && alumnosFiltrados.length > 0) { %>
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>ID</th>
+            <th>Matrícula</th>
+            <th>Nombre</th>
+            <th>Carrera</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% alumnosFiltrados.forEach(al => { %>
+            <tr>
+              <td><%= al.id %></td>
+              <td><%= al.matricula %></td>
+              <td><%= al.nombre %></td>
+              <td><%= al.carrera %></td>
+              <td><%= al.status ? 'Activo' : 'Inactivo' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+  
+<script>
+
+  document.getElementById('limpiarImagen').addEventListener('click', function() {
+    const cardContainer = document.querySelector('.card');
+    if (cardContainer) {
+      cardContainer.style.display = 'none';
+    }
+  });
+
+  document.getElementById('limpiarTabla').addEventListener('click', function() {
+    const tbody = document.querySelector('table tbody');
+    if (tbody) {
+      tbody.innerHTML = '';
+    }
+  });
+
+document.getElementById('campoBusqueda').addEventListener('change', function() {
+  const valorContainer = document.getElementById('valorContainer');
+  if (this.value === 'carrera') {
+    valorContainer.innerHTML = `
+      <select name="valor" class="form-select" required>
+        <option value="">Selecciona una carrera</option>
+        <option value="1">Ingeniería Mecatrónica</option>
+        <option value="2">Ingeniería en Biotecnología</option>
+        <option value="3">Ingeniería en Informática</option>
+        <option value="4">Ingeniería en Energía</option>
+        <option value="5">Ingeniería Logística y Transporte</option>
+        <option value="6">Ingeniería en Tecnología Ambiental</option>
+        <option value="7">Ingeniería Biomédica</option>
+        <option value="8">Ingeniería en Animación y Efectos Visuales</option>
+        <option value="9">Ingeniería en Nanotecnología</option>
+        <option value="10">Ingeniería en Energía y Desarrollo Sostenible</option>
+      </select>
+    `;
+  } else {
+    valorContainer.innerHTML = `
+      <input type="text" name="valor" class="form-control" placeholder="Introduce el valor a buscar" required>
+    `;
+  }
+});
+
+
+document.getElementById('alumnirijillos').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const mensajeDiv = document.getElementById('mensajeBusqueda');
+
+  try {
+    mensajeDiv.textContent = 'Buscando...';
+    mensajeDiv.classList.remove('d-none', 'alert-danger', 'alert-success');
+    mensajeDiv.classList.add('alert-info');
+    const response = await fetch(`http://localhost:4000/api/mostrar-alumnos?${new URLSearchParams(formData)}`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    const data = await response.json();
+    const params = new URLSearchParams(formData);
+    const campo = params.get('campo');
+    const valor = params.get('valor');
+    console.log(data)
+
+    // Filtrar los resultados según los parámetros
+    data.data.alumnosFiltrados = data.data.alumnosFiltrados.filter(alumno => {
+      switch (campo) {
+        case 'nombre':
+          return alumno.nombre.toLowerCase().includes(valor.toLowerCase());
+        case 'matricula':
+          return alumno.matricula.includes(valor);
+        case 'carrera':
+          const carrerasMap = {
+            '1': 'Ingeniería Mecatrónica',
+            '2': 'Ingeniería en Biotecnología',
+            '3': 'Ingeniería en Informática',
+            '4': 'Ingeniería en Energía',
+            '5': 'Ingeniería Logística y Transporte',
+            '6': 'Ingeniería en Tecnología Ambiental',
+            '7': 'Ingeniería Biomédica',
+            '8': 'Ingeniería en Animación y Efectos Visuales',
+            '9': 'Ingeniería en Nanotecnología',
+            '10': 'Ingeniería en Energía y Desarrollo Sostenible'
+          };
+          return alumno.carrera === carrerasMap[valor];
+        default:
+          return false;
+      }
+    });
+
+    mensajeDiv.textContent = `Se encontraron ${data.data.alumnosFiltrados.length} alumno/s.`;
+    mensajeDiv.classList.remove('alert-info', 'alert-danger');
+    mensajeDiv.classList.add(data.success ? 'alert-success' : 'alert-danger');
+
+    // Crear o actualizar tabla
+    let tableContainer = document.querySelector('.table-responsive');
+    if (!tableContainer) {
+      tableContainer = document.createElement('div');
+      tableContainer.className = 'table-responsive mt-4';
+      document.querySelector('form').after(tableContainer);
+    }
+
+    if (data.success && data.data.alumnosFiltrados.length > 0) {
+      tableContainer.innerHTML = `
+        <table class="table table-bordered">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Matrícula</th>
+              <th>Nombre</th>
+              <th>Carrera</th>
+              <th>Status</th>
+              <th>Fecha de Registro</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${data.data.alumnosFiltrados.map(al => `
+              <tr>
+                <td>${al.id || ''}</td>
+                <td>${al.matricula || ''}</td>
+                <td>${al.nombre || ''}</td>
+                <td>${al.carrera || ''}</td>
+                <td>${al.status ? 'Activo' : 'Inactivo'}</td>
+                <td>${al.created_at || ''}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    } else {
+      tableContainer.innerHTML = '<div class="alert alert-warning mt-3">No se encontraron resultados.</div>';
+    }
+
+  } catch (err) {
+    console.error('Error:', err);
+    mensajeDiv.textContent = 'Error al buscar: ' + err.message;
+    mensajeDiv.classList.remove('alert-info', 'alert-success');
+    mensajeDiv.classList.add('alert-danger');
+  }
+});
+
+document.querySelector('form[action="/api/buscar-id"]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const mensajeDiv = document.getElementById('mensajeBusqueda');
+
+  try {
+    mensajeDiv.textContent = 'Buscando...';
+    mensajeDiv.classList.remove('d-none', 'alert-danger', 'alert-success');
+    mensajeDiv.classList.add('alert-info');
+
+    const response = await fetch(`http://localhost:4000/api/buscar-id?${new URLSearchParams(formData)}`, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message);
+    }
+
+    // Update UI with image
+    const imageContainer = document.querySelector('.container.mb-5');
+    if (data.data.imagenPorId) {
+      imageContainer.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <h4>Imagen encontrada (ID: ${data.data.imagenPorId.id})</h4>
+          </div>
+          <div class="card-body text-center">
+            <img src="/uploads/${data.data.imagenPorId.filename}" 
+                 class="img-fluid rounded" 
+                 style="max-height: 400px;" 
+                 alt="Imagen encontrada">
+            <p class="mt-2 text-muted">Nombre del archivo: ${data.data.imagenPorId.filename}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    mensajeDiv.textContent = data.message;
+    mensajeDiv.classList.remove('alert-info', 'alert-danger');
+    mensajeDiv.classList.add('alert-success');
+
+  } catch (err) {
+    console.error('Error:', err);
+    mensajeDiv.textContent = err.message;
+    mensajeDiv.classList.remove('alert-info', 'alert-success');
+    mensajeDiv.classList.add('alert-danger');
+  }
+});
+</script>
+
+<%- include('footer') %>

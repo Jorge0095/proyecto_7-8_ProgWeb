@@ -1,0 +1,83 @@
+<%- include('layout') %>
+
+<div class="container mt-5">
+  <h2>Registrar Alumno</h2>
+  <div id="errorMessage" class="alert alert-danger d-none"></div>
+
+  <form action="/api/alumnos" method="POST">
+    <div class="mb-3">
+      <label for="matricula" class="form-label">Matrícula</label>
+      <input type="text" class="form-control" id="matricula" name="matricula" required>
+    </div>
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre</label>
+      <input type="text" class="form-control" id="nombre" name="nombre" required>
+    </div>
+    <div class="mb-3">
+      <label for="carrera" class="form-label">Carrera</label>
+  <select class="form-select" name="carrera" id="carrera" required>
+    <option value="">Selecciona una carrera</option>
+    <option value="1">Ingeniería Mecatrónica</option>
+    <option value="2">Ingeniería en Biotecnología</option>
+    <option value="3">Ingeniería en Informática</option>
+    <option value="4">Ingeniería en Energía</option>
+    <option value="5">Ingeniería Logística y Transporte</option>
+    <option value="6">Ingeniería en Tecnología Ambiental</option>
+    <option value="7">Ingeniería Biomédica</option>
+    <option value="8">Ingeniería en Animación y Efectos Visuales</option>
+    <option value="9">Ingeniería en Nanotecnología</option>
+    <option value="10">Ingeniería en Energía y Desarrollo Sostenible</option>
+  </select>
+    </div>
+    <div class="mb-3 form-check">
+      <input type="checkbox" class="form-check-input" id="status" name="status">
+      <label class="form-check-label" for="status">Activo</label>
+    </div>
+    <button type="submit" class="btn btn-primary" id="submitBtn">Guardar</button>
+  </form>
+</div>
+
+<script>
+document.querySelector('form[action="/api/alumnos"]').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = document.getElementById('submitBtn');
+  const mensajeDiv = document.getElementById('errorMessage');
+  
+  try {
+    submitBtn.disabled = true;
+    const formData = new FormData(form);
+    
+    const response = await fetch('http://localhost:4000/api/alumnos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(Object.fromEntries(formData))
+    });
+
+    const data = await response.json();
+    
+    mensajeDiv.textContent = data.message;
+    mensajeDiv.classList.remove('d-none', 'alert-danger', 'alert-success');
+    mensajeDiv.classList.add(data.success ? 'alert-success' : 'alert-danger');
+
+    if (data.success) {
+      form.reset();
+      setTimeout(() => {
+        mensajeDiv.classList.add('d-none');
+        window.location.reload();
+      }, 2000);
+    }
+
+  } catch (err) {
+    mensajeDiv.textContent = 'Error al registrar alumno';
+    mensajeDiv.classList.remove('d-none', 'alert-success');
+    mensajeDiv.classList.add('alert-danger');
+  } finally {
+    submitBtn.disabled = false;
+  }
+});
+</script>
+
+<%- include('footer') %>

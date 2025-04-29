@@ -1,0 +1,53 @@
+<%- include('layout') %>
+
+<div class="container mt-5">
+  <h2>Subir Imagen</h2>
+  <form action="/api/upload" method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="image" class="form-label">Selecciona una imagen</label>
+      <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+    </div>
+    <button id="submitBtn" type="submit" class="btn btn-primary">Subir Imagen</button>
+  </form>
+</div>
+
+  <div class="mt-4">
+    <h3>Imágenes subidas</h3>
+    <div class="row">
+      <% if (typeof images !== 'undefined') { %>
+        <% images.forEach(function(image) { %>
+          <div class="col-md-4 mb-3">
+            <img src="/uploads/<%= image.filename %>" class="img-fluid" alt="Imagen subida">
+          </div>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    document.querySelector('form[action="/api/upload"]').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const form = new FormData((e.target));
+      try {
+        const response = await fetch('http://localhost:4000/api/upload', {
+          method: 'POST',
+          body: form
+        });
+        if (response.ok) {
+          alert('Imagen subida con éxito!');
+          window.location.reload();
+        } else {
+          alert('Error al subir la imagen: ' + data.message);
+        } 
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al subir la imagen: ' + error.message);
+      }
+    });
+    </script>
+
+<%- include('footer') %>
+
+
+   
+
