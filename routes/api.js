@@ -22,6 +22,13 @@ router.get('/inicio', async (req, res) => {
     const db = await connectDB();
     const [rows] = await db.query('SELECT * FROM alumnos');
     res.json({ success: true, data: rows });
+    res.render('index', {
+      alumnoPorId: null,
+      alumnosFiltrados: alumnos,
+      imagenPorId: null,
+      images,
+      alumnos
+    });
   } catch (error) {
     console.error('Error al consultar la base de datos:', error);
     res.json({ success: false, message: 'Error al cargar la página' });
