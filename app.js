@@ -1,3 +1,4 @@
+const connectDB = require('../module/db');
 const express = require('express');
 const fs = require('fs');
 const app = express();
@@ -25,6 +26,22 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
+
+// Async
+(async () => {
+  const db = await connectDB();
+
+  // Leer el archivo SQL
+  const sqlPath = path.join(__dirname, 'app.sql');
+  const sql = fs.readFileSync(sqlPath, 'utf8');
+
+  try {
+    await db.query(sql);
+    console.log('Script SQL ejecutado correctamente.');
+  } catch (err) {
+    console.error('Error al ejecutar app.sql:', err);
+  }
+})();
 
 // Rutas principales
 app.use('/', apiRouter);
