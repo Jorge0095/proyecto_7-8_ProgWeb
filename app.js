@@ -5,7 +5,7 @@ const app = express();
 const path = require('path');
 const multer = require('multer');
 const alumnoDB = require('./module/model');
-const db = require('./module/db');
+//const db = require('./module/db');
 const apiRouter = require('./routes/api');
 const cors = require('cors');
 const PORT = process.env.PORT || 4000;
@@ -54,6 +54,7 @@ app.get('/', (req, res) => {
 // Página principal con render EJS
 app.get('/inicio', async (req, res) => {
   try {
+    const db = await connectDB();
     const [images] = await db.query('SELECT * FROM images ORDER BY id DESC');
     const alumnos = await alumnoDB.getAllAlumnos();
     
@@ -114,6 +115,7 @@ app.post('/api/alumnos', async (req, res) => {
     };
 
     // Obtener último ID
+    const db = await connectDB();
     const [lastIdResult] = await db.query('SELECT MAX(id) as lastId FROM alumnos');
     const nextId = (lastIdResult[0].lastId || 0) + 1;
 
