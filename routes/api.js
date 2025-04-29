@@ -1,7 +1,7 @@
 
 const express = require('express');
 const router = express.Router();
-const db = require('../module/db');
+const connectDB = require('../module/db');
 const alumnoDB = require('../module/model'); 
 const multer = require('multer');
 const path = require('path');
@@ -19,6 +19,7 @@ const upload = multer({ storage });
 
 router.get('/inicio', async (req, res) => {
   try {
+    const db = await connectDB();
     const [rows] = await db.query('SELECT * FROM alumnos');
     res.json({ success: true, data: rows });
   } catch (error) {
@@ -40,6 +41,7 @@ router.get('/alumnos', (req, res) => {
 // Buscar imagen por ID
 router.get('/api/buscar-id', async (req, res) => {
   const { id } = req.query;
+  const db = await connectDB();
   
   if (!id) {
     return res.status(400).json({ 
@@ -49,6 +51,7 @@ router.get('/api/buscar-id', async (req, res) => {
   }
 
   try {
+    const db = await connectDB();
     const [result] = await db.query('SELECT * FROM images WHERE id = ?', [id]);
     
     if (result.length === 0) {
@@ -155,6 +158,7 @@ router.get('/api/mostrar-alumnos', async (req, res) => {
 
 router.get('/upload', async (req, res) => {
   try {
+    const db = await connectDB();
     const [images] = await db.query('SELECT * FROM images ORDER BY id DESC');
     res.render('upload', { images });
   } catch (error) {
