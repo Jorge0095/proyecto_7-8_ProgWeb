@@ -48,7 +48,7 @@ document.querySelector('form[action="/api/alumnos"]').addEventListener('submit',
     submitBtn.disabled = true;
     const formData = new FormData(form);
     
-    const response = await fetch('http://localhost:4000/api/alumnos', {
+    const response = await fetch('https://proyecto7-8progweb-production.up.railway.app/api/alumnos', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
