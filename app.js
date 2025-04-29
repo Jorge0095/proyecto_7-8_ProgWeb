@@ -1,4 +1,4 @@
-const connectDB = require('../module/db');
+const connectDB = require('./module/db');
 const express = require('express');
 const fs = require('fs');
 const app = express();
