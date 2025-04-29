@@ -16,16 +16,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get('/inicio', async (req, res) => {
-  try {
-    const db = await connectDB();
-    const [rows] = await db.query('SELECT * FROM alumnos');
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('Error al consultar la base de datos:', error);
-    res.json({ success: false, message: 'Error al cargar la página' });
-  }
-});
+// router.get('/inicio', async (req, res) => {
+//   try {
+//     const db = await connectDB();
+//     const [rows] = await db.query('SELECT * FROM alumnos');
+//     res.json({ success: true, data: rows });
+//   } catch (error) {
+//     console.error('Error al consultar la base de datos:', error);
+//     res.json({ success: false, message: 'Error al cargar la página' });
+//   }
+// });
 
 
 router.get('/alumnos', (req, res) => {
@@ -194,6 +194,20 @@ router.post('/alumnos', async (req, res) => {
       });
     }
 
+    // Mapeo de carreras
+    const carrerasMap = {
+      '1': 'Ingeniería Mecatrónica',
+      '2': 'Ingeniería en Biotecnología',
+      '3': 'Ingeniería en Informática',
+      '4': 'Ingeniería en Energía',
+      '5': 'Ingeniería Logística y Transporte',
+      '6': 'Ingeniería en Tecnología Ambiental',
+      '7': 'Ingeniería Biomédica',
+      '8': 'Ingeniería en Animación y Efectos Visuales',
+      '9': 'Ingeniería en Nanotecnología',
+      '10': 'Ingeniería en Energía y Desarrollo Sostenible'
+    };
+
     // Obtener último ID del JSON
     const alumnosPath = path.join(__dirname, '../uploads/alumnos.json');
     let alumnosArray = [];
@@ -209,6 +223,7 @@ router.post('/alumnos', async (req, res) => {
       ? Math.max(...alumnosArray.map(a => a.id)) + 1 
       : 1;
 
+    // Crear nuevo alumno
     const nuevoAlumno = {
       id: nextId,
       matricula,
@@ -233,34 +248,6 @@ router.post('/alumnos', async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Error al registrar alumno' 
-    });
-  }
-});
-
-// Agregar ruta GET para renderizar la página
-router.get('/alumnos', async (req, res) => {
-  try {
-    const alumnosPath = path.join(__dirname, '../uploads/alumnos.json');
-    let alumnos = [];
-    
-    try {
-      const jsonContent = await fs.readFile(alumnosPath, 'utf8');
-      alumnos = JSON.parse(jsonContent);
-    } catch (err) {
-      console.error('Error leyendo alumnos.json:', err);
-    }
-
-    res.render('alumnos', { 
-      alumnos,
-      message: req.query.message,
-      success: req.query.success === 'true'
-    });
-  } catch (error) {
-    console.error('Error al cargar alumnos:', error);
-    res.render('alumnos', { 
-      alumnos: [],
-      message: 'Error al cargar alumnos',
-      success: false
     });
   }
 });
